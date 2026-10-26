@@ -2,5 +2,7 @@
   "name": "The Ultimate Color Psychology & Cinematography Matrix",
   "description": "Interactive masterclass exploring color psychology, cinematic harmonies, accessibility simulation, DaVinci Resolve workflows, natural skin tone precision, and academic color theory.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

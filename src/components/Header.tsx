@@ -15,6 +15,9 @@ interface HeaderProps {
   setActiveTab: (tab: ActiveTab) => void;
   onOpenSavedRecipes: () => void;
   savedCount: number;
+  onOpenGoogleDrive: () => void;
+  onOpenInstallGuide: () => void;
+  isDriveConnected?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +25,9 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   onOpenSavedRecipes,
   savedCount,
+  onOpenGoogleDrive,
+  onOpenInstallGuide,
+  isDriveConnected,
 }) => {
   const tabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'psychology', label: 'Psychology', icon: <Palette className="w-4 h-4" /> },
@@ -35,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-[#090d16]/95 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 lg:gap-8">
         {/* Zone 1: Brand wordmark (single text element) */}
         <div className="flex items-center gap-2.5 shrink-0">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-cyan-500 p-0.5 flex items-center justify-center">
@@ -74,15 +80,45 @@ export const Header: React.FC<HeaderProps> = ({
           })}
         </nav>
 
-        {/* Zone 3: 1 Primary Action */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: Header Actions (Google Drive, Install App, Saved Recipes) */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Google Drive Sync Button */}
+          <button
+            onClick={onOpenGoogleDrive}
+            aria-label="Open Google Drive cloud sync"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:text-white bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/70 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow-sm"
+            title="Google Drive Cloud Sync & LUT Storage"
+          >
+            <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.72 6.5l3.43 6h9.99l-3.43-6H9.43zm7.42-6.5L13.42 9l3.43 6 6.56-11.5H16.85z" />
+            </svg>
+            <span className="hidden sm:inline">Drive</span>
+            {isDriveConnected && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            )}
+          </button>
+
+          {/* Install App Guide Button */}
+          <button
+            onClick={onOpenInstallGuide}
+            aria-label="How to install app"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-lg transition-colors whitespace-nowrap shrink-0"
+            title="How to install as Desktop or Mobile app"
+          >
+            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span className="hidden sm:inline">Install App</span>
+          </button>
+
+          {/* Saved Recipes Button */}
           <button
             onClick={onOpenSavedRecipes}
             aria-label="Open saved recipes library"
-            className="flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-750 hover:text-white border border-slate-700/80 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow-sm"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-750 hover:text-white border border-slate-700/80 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow-sm"
           >
             <Compass className="w-3.5 h-3.5 text-amber-400" />
-            <span>Saved Recipes</span>
+            <span className="hidden sm:inline">Saved Recipes</span>
             {savedCount > 0 && (
               <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded text-[10px] font-mono font-semibold">
                 {savedCount}

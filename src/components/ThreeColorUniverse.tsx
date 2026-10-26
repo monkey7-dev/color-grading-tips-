@@ -136,7 +136,7 @@ export const ThreeColorUniverse: React.FC = () => {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.shadowMap.enabled = !isSoftwareGl;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
 
     container.appendChild(renderer.domElement);
 
@@ -382,7 +382,7 @@ export const ThreeColorUniverse: React.FC = () => {
 
     // Animation & State Loop
     let frameId = 0;
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
 
     function afterDraw(cb: () => void) {
       const gl = renderer.getContext() as WebGL2RenderingContext;
@@ -415,8 +415,9 @@ export const ThreeColorUniverse: React.FC = () => {
     }
 
     function tick() {
-      const delta = clock.getDelta();
-      const elapsed = clock.getElapsedTime();
+      timer.update();
+      const delta = timer.getDelta();
+      const elapsed = timer.getElapsed();
 
       // Rotate prism and gyroscopes
       ringA.rotation.z = elapsed * 0.4;

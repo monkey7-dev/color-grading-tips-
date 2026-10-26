@@ -144,13 +144,13 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+                <div className="flex items-center flex-wrap gap-1.5 self-end sm:self-center shrink-0">
                   <button
                     onClick={() => {
                       onLoadRecipe(recipe);
                       onClose();
                     }}
-                    className="p-2 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs flex items-center gap-1.5"
+                    className="px-2.5 py-1.5 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs flex items-center gap-1.5 transition-colors"
                     title="Load into Color Wheel"
                   >
                     <Compass className="w-3.5 h-3.5 text-cyan-400" />
@@ -159,31 +159,34 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
 
                   <button
                     onClick={() => exportAse(recipe)}
-                    className="p-2 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs"
-                    title="Export .ASE (Photoshop/Illustrator)"
+                    className="px-2.5 py-1.5 text-indigo-300 hover:text-white bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-800/60 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-medium"
+                    title="Export as ASE (Adobe Swatch Exchange for Photoshop/Illustrator)"
                   >
                     <Download className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Export as ASE</span>
                   </button>
 
                   <button
                     onClick={() => exportCube(recipe)}
-                    className="p-2 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs"
-                    title="Export .CUBE (DaVinci Resolve / Premiere 3D LUT)"
+                    className="px-2.5 py-1.5 text-cyan-300 hover:text-white bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/60 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-medium"
+                    title="Export as LUT (DaVinci Resolve / Premiere Pro 3D CUBE)"
                   >
                     <Download className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Export as LUT</span>
                   </button>
 
                   <button
                     onClick={() => exportXmp(recipe)}
-                    className="p-2 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs"
-                    title="Export .XMP (Lightroom Classic)"
+                    className="px-2.5 py-1.5 text-amber-300 hover:text-white bg-amber-950/40 hover:bg-amber-900/60 border border-amber-800/60 rounded-lg text-xs flex items-center gap-1.5 transition-colors font-medium"
+                    title="Export as Lightroom Preset (.XMP)"
                   >
                     <Download className="w-3.5 h-3.5 text-amber-400" />
+                    <span>XMP</span>
                   </button>
 
                   <button
                     onClick={() => onDeleteRecipe(recipe.id)}
-                    className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg text-xs"
+                    className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg text-xs transition-colors"
                     title="Delete recipe"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

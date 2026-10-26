@@ -15,6 +15,9 @@ import { SkinToneSection } from './components/SkinToneSection';
 import { LibrarySection } from './components/LibrarySection';
 import { ThreeColorUniverse } from './components/ThreeColorUniverse';
 import { RecipeModal } from './components/RecipeModal';
+import { GoogleDriveModal } from './components/GoogleDriveModal';
+import { InstallModal } from './components/InstallModal';
+import { initAuth } from './services/googleDriveAuth';
 import { ColorRecipe } from './utils/exporters';
 import { hexToRgb, rgbToHsl } from './utils/colorMath';
 
@@ -77,6 +80,18 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('psychology');
   const [currentBaseHue, setCurrentBaseHue] = useState<number>(38);
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState<boolean>(false);
+  const [isGoogleDriveModalOpen, setIsGoogleDriveModalOpen] = useState<boolean>(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
+  const [isDriveConnected, setIsDriveConnected] = useState<boolean>(false);
+
+  // Check Drive auth connection state
+  useEffect(() => {
+    const unsub = initAuth(
+      () => setIsDriveConnected(true),
+      () => setIsDriveConnected(false)
+    );
+    return () => unsub();
+  }, []);
 
   // Saved recipes state with localStorage
   const [savedRecipes, setSavedRecipes] = useState<ColorRecipe[]>(() => {
@@ -114,12 +129,14 @@ export default function App() {
   };
 
   const handleLoadRecipe = (recipe: ColorRecipe) => {
-    if (recipe.swatches[0]) {
+    if (recipe.swatches && recipe.swatches[0]) {
       const rgb = hexToRgb(recipe.swatches[0].hex);
       const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
       setCurrentBaseHue(hsl.h);
       setActiveTab('harmonies');
     }
+    // Also ensure recipe is saved into local library if imported from Drive
+    setSavedRecipes(prev => [recipe, ...prev.filter(r => r.id !== recipe.id)]);
   };
 
   return (
@@ -130,6 +147,9 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenSavedRecipes={() => setIsRecipeModalOpen(true)}
         savedCount={savedRecipes.length}
+        onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
+        onOpenInstallGuide={() => setIsInstallModalOpen(true)}
+        isDriveConnected={isDriveConnected}
       />
 
       {/* Main Content Area */}
@@ -219,6 +239,20 @@ export default function App() {
         recipes={savedRecipes}
         onDeleteRecipe={handleDeleteRecipe}
         onLoadRecipe={handleLoadRecipe}
+      />
+
+      {/* Google Drive Cloud Sync Modal */}
+      <GoogleDriveModal
+        isOpen={isGoogleDriveModalOpen}
+        onClose={() => setIsGoogleDriveModalOpen(false)}
+        recipes={savedRecipes}
+        onLoadRecipeIntoApp={handleLoadRecipe}
+      />
+
+      {/* App Install Guide Modal */}
+      <InstallModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
       />
     </div>
   );
