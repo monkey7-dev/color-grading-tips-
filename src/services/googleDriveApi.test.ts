@@ -74,6 +74,16 @@ describe('Google Drive API Client Tests', () => {
     assert.strictEqual(files[1].name, 'blade_runner_preset.xmp');
   });
 
+  test('listDriveFiles escapes backslashes and apostrophes in search queries', async () => {
+    globalThis.fetch = async (url: any) => {
+      const query = new URL(String(url)).searchParams.get('q');
+      assert.strictEqual(query, "trashed = false and name contains 'path\\\\to\\'file'");
+      return { ok: true, json: async () => ({ files: [] }) } as any;
+    };
+
+    await listDriveFiles({ accessToken: 'mock-token', searchQuery: "path\\to'file" });
+  });
+
   test('uploadToDrive sends multipart payload and returns file metadata', async () => {
     let capturedBody: any;
     globalThis.fetch = async (url: any, opts: any) => {

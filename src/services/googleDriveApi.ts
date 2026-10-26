@@ -167,7 +167,8 @@ export async function listDriveFiles({
   }
 
   if (searchQuery.trim()) {
-    queryParts.push(`name contains '${searchQuery.trim().replace(/'/g, "\\'")}'`);
+    const escapedSearchQuery = searchQuery.trim().replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    queryParts.push(`name contains '${escapedSearchQuery}'`);
   }
 
   const q = queryParts.join(' and ');
