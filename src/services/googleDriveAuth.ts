@@ -6,6 +6,7 @@ import {
   onAuthStateChanged,
   User,
   signOut,
+  type Auth,
 } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -20,17 +21,32 @@ const firebaseConfig = {
   recaptchaSiteKey: import.meta.env.VITE_FIREBASE_RECAPTCHA_SITE_KEY ?? '',
 };
 
-const missingConfig = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
+// Only these fields are required to initialize Firebase Auth.
+const REQUIRED_CONFIG_KEYS = ['apiKey', 'authDomain', 'projectId', 'appId'] as const;
 
-if (missingConfig.length > 0) {
-  throw new Error(`Missing Firebase config: ${missingConfig.join(', ')}`);
+const missingConfig = REQUIRED_CONFIG_KEYS.filter(key => !firebaseConfig[key]);
+
+export const isFirebaseConfigured = missingConfig.length === 0;
+
+if (!isFirebaseConfigured) {
+  // Don't throw at module load: that would crash the entire app and render a blank page.
+  // Google Drive sync is simply disabled until the config is provided.
+  console.warn(`Google Drive sync disabled. Missing Firebase config: ${missingConfig.join(', ')}`);
 }
 
-// Initialize Firebase App singleton safely
-export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
+const NOT_CONFIGURED_MESSAGE =
+  'Google Drive sync is not configured for this site. Set the VITE_FIREBASE_* environment variables and redeploy.';
+
+// Initialize Firebase App singleton lazily and only when configured
+let authInstance: Auth | null = null;
+const getFirebaseAuth = (): Auth | null => {
+  if (!isFirebaseConfigured) return null;
+  if (!authInstance) {
+    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    authInstance = getAuth(app);
+  }
+  return authInstance;
+};
 
 // Google Drive Scopes
 export const DRIVE_SCOPES = [
@@ -51,6 +67,11 @@ export const initAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void
 ) => {
+  const auth = getFirebaseAuth();
+  if (!auth) {
+    if (onAuthFailure) onAuthFailure();
+    return () => {};
+  }
   return onAuthStateChanged(auth, async (user: User | null) => {
     if (user) {
       if (cachedAccessToken) {
@@ -67,6 +88,8 @@ export const initAuth = (
 };
 
 export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
+  const auth = getFirebaseAuth();
+  if (!auth) throw new Error(NOT_CONFIGURED_MESSAGE);
   try {
     isSigningIn = true;
     const result = await signInWithPopup(auth, provider);
@@ -94,6 +117,7 @@ export const setAccessToken = (token: string | null) => {
 };
 
 export const googleSignOut = async (): Promise<void> => {
-  await signOut(auth);
+  const auth = getFirebaseAuth();
+  if (auth) await signOut(auth);
   cachedAccessToken = null;
 };
