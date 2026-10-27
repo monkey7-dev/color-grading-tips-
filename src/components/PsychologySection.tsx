@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PSYCHOLOGY_ITEMS, EmotionTraitItem } from '../data/psychologyData';
 import { PsychologyGraph } from './PsychologyGraph';
 import { ColorDepthExplorer } from './ColorDepthExplorer';
+import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 import { Check, Copy, Film, HeartPulse, Brain, Globe, Compass, Sliders } from 'lucide-react';
 
 interface PsychologySectionProps {
@@ -346,6 +347,14 @@ export const PsychologySection: React.FC<PsychologySectionProps> = ({ onLoadInto
           onLoadIntoWheel={onLoadIntoWheel}
         />
       </div>
+
+      {/* Post-Production Software Guide (DaVinci Resolve & Lightroom) */}
+      <PostProductionSoftwareGuide
+        selectedColor={selectedItem.primaryColor}
+        colorName={`${selectedItem.name} (${selectedItem.associatedColors[0]?.name || 'Dominant'})`}
+        secondaryColor={selectedItem.associatedColors[1]?.hex || '#0f172a'}
+        contextTitle={`How to Create "${selectedItem.name}" in DaVinci Resolve & Lightroom`}
+      />
     </section>
   );
 };

@@ -16,6 +16,7 @@ import {
   Sparkles,
   Eye,
 } from 'lucide-react';
+import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
 export const LibrarySection: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -331,6 +332,14 @@ export const LibrarySection: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Dynamic Software Grading & Export Guide for Tested Reference Tone */}
+      <PostProductionSoftwareGuide
+        selectedColor={albersInnerColor}
+        colorName="Reference Optical Tone"
+        secondaryColor="#1e293b"
+        contextTitle="How to Calibrate Reference Neutral & Perceptual Tones in DaVinci & Lightroom"
+      />
     </section>
   );
 };

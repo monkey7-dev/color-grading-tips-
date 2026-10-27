@@ -7,6 +7,7 @@ import {
   ColorBlindnessType,
 } from '../utils/colorMath';
 import { Eye, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Sparkles } from 'lucide-react';
+import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
 export const AccessibilitySection: React.FC = () => {
   const [fgHex, setFgHex] = useState<string>('#ffffff');
@@ -423,6 +424,14 @@ export const AccessibilitySection: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Dynamic Software Grading & Export Guide for Tested Accessibility Pair */}
+      <PostProductionSoftwareGuide
+        selectedColor={fgHex}
+        colorName="Foreground Target Color"
+        secondaryColor={bgHex}
+        contextTitle="How to Calibrate High-Contrast Accessible Colors in DaVinci & Lightroom"
+      />
     </section>
   );
 };

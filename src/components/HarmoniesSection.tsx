@@ -24,6 +24,7 @@ import {
   Sliders,
   Sparkles,
 } from 'lucide-react';
+import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
 interface HarmoniesSectionProps {
   currentBaseHue: number;
@@ -709,6 +710,14 @@ export const HarmoniesSection: React.FC<HarmoniesSectionProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Dynamic Software Grading & Export Guide for Current Harmony */}
+      <PostProductionSoftwareGuide
+        selectedColor={swatches[0]?.hex || '#f59e0b'}
+        colorName={`${harmonyInfo.title} (${swatches[0]?.name || 'Primary Swatch'})`}
+        secondaryColor={swatches[1]?.hex || '#0a192f'}
+        contextTitle={`How to Create "${harmonyInfo.title}" in DaVinci Resolve & Lightroom`}
+      />
     </section>
   );
 };

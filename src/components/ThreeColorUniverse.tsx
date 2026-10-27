@@ -22,6 +22,7 @@ import {
   Info,
   Maximize2,
 } from 'lucide-react';
+import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
 export type ColorSpaceMode = 'cube' | 'cylinder' | 'sphere';
 export type CameraPreset = 'perspective' | 'top' | 'macro';
@@ -839,6 +840,16 @@ export const ThreeColorUniverse: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Dynamic Software Grading & Export Guide for 3D Color Volume */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <PostProductionSoftwareGuide
+          selectedColor={selectedEmotion.dominantHex}
+          colorName={`${selectedEmotion.name} Volumetric Space`}
+          secondaryColor={selectedEmotion.representativeTones[1]?.hex || '#0f172a'}
+          contextTitle={`How to Create "${selectedEmotion.name}" in DaVinci Resolve & Lightroom`}
+        />
       </div>
     </div>
   );

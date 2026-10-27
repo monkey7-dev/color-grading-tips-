@@ -10,7 +10,7 @@ import {
   isSkinPixel,
   SkinAnalysisResult,
 } from '../utils/skinToneAnalysis';
-import { RGB } from '../utils/colorMath';
+import { RGB, rgbToHex } from '../utils/colorMath';
 import {
   Upload,
   User,
@@ -21,6 +21,7 @@ import {
   Camera,
   RefreshCw,
 } from 'lucide-react';
+import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
 export const SkinToneSection: React.FC = () => {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('caucasian_fair');
@@ -561,6 +562,14 @@ export const SkinToneSection: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Dynamic Software Grading & Export Guide for Analyzed Skin Tone */}
+      <PostProductionSoftwareGuide
+        selectedColor={rgbToHex(analysis.averageRgb.r, analysis.averageRgb.g, analysis.averageRgb.b)}
+        colorName={`${selectedPreset.name} Skin Tone`}
+        secondaryColor="#0c1626"
+        contextTitle={`How to Grade & Protect "${selectedPreset.name}" on the 135° I-Line`}
+      />
     </section>
   );
 };
