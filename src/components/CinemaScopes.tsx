@@ -127,10 +127,17 @@ export const CinemaScopes: React.FC<CinemaScopesProps> = ({
                 <Disc className="w-3.5 h-3.5" />
                 <span>Vectorscope (75% Rec.709 Graticule)</span>
               </span>
-              <span className="text-[10px] font-mono text-amber-400 flex items-center gap-1">
-                <span className="w-2 h-0.5 bg-amber-400 inline-block" />
-                <span>135° Skin Line (I-Line)</span>
-              </span>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                <span className="text-amber-400 flex items-center gap-1">
+                  <span className="w-2 h-0.5 bg-amber-400 inline-block" />
+                  <span>123° Broadcast I-Line</span>
+                </span>
+                <span className="text-slate-500">·</span>
+                <span className="text-amber-300/60 flex items-center gap-1">
+                  <span className="w-2 h-0.5 border-t border-dashed border-amber-300 inline-block" />
+                  <span>135° Ref</span>
+                </span>
+              </div>
             </div>
 
             <div className="relative aspect-square max-w-[240px] mx-auto bg-slate-950 rounded-full border border-slate-800 p-2 shadow-inner">
@@ -144,44 +151,65 @@ export const CinemaScopes: React.FC<CinemaScopesProps> = ({
                 <line x1="10" y1="100" x2="190" y2="100" stroke="#334155" strokeWidth="0.8" />
                 <line x1="100" y1="10" x2="100" y2="190" stroke="#334155" strokeWidth="0.8" />
 
-                {/* 135° Skin Tone Line (I-Line) */}
+                {/* Skin Tone ±8° Tolerance Wedge (115° to 131°) */}
+                <path
+                  d="M 100 100 L 60 18 A 90 90 0 0 1 40 37 Z"
+                  fill="#f59e0b"
+                  fillOpacity="0.08"
+                />
+
+                {/* Standard Broadcast I-Line (123°) */}
                 <line
                   x1="100"
                   y1="100"
-                  x2="35"
-                  y2="35"
+                  x2="48"
+                  y2="20"
                   stroke="#f59e0b"
-                  strokeWidth="1.8"
-                  strokeDasharray="4 2"
+                  strokeWidth="2"
                 />
-                <text x="24" y="30" fill="#f59e0b" fontSize="8" fontFamily="monospace" fontWeight="bold">
-                  SKIN (I)
+                <text x="32" y="18" fill="#f59e0b" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
+                  I (123°)
                 </text>
 
-                {/* Rec.709 Color Target Boxes (R, Mg, B, Cy, G, Yl) */}
-                {/* Red (approx 105° on vectorscope) */}
-                <rect x="75" y="24" width="8" height="8" fill="none" stroke="#ef4444" strokeWidth="1" />
-                <text x="86" y="31" fill="#ef4444" fontSize="7" fontFamily="monospace">R</text>
+                {/* App Classic Line (135°) */}
+                <line
+                  x1="100"
+                  y1="100"
+                  x2="38"
+                  y2="38"
+                  stroke="#fbbf24"
+                  strokeWidth="1"
+                  strokeDasharray="3 2"
+                  opacity="0.6"
+                />
+                <text x="18" y="38" fill="#fbbf24" opacity="0.7" fontSize="6.5" fontFamily="monospace">
+                  135°
+                </text>
 
-                {/* Magenta (approx 45°) */}
-                <rect x="145" y="42" width="8" height="8" fill="none" stroke="#ec4899" strokeWidth="1" />
-                <text x="156" y="49" fill="#ec4899" fontSize="7" fontFamily="monospace">Mg</text>
+                {/* Rec.709 75% Color Target Boxes (R 104°, Mg 61°, B 347°, Cy 284°, G 241°, Yl 167°) */}
+                {/* Red (104°) -> x=84, y=37 */}
+                <rect x="80" y="33" width="8" height="8" fill="none" stroke="#ef4444" strokeWidth="1" />
+                <text x="90" y="40" fill="#ef4444" fontSize="7" fontFamily="monospace" fontWeight="bold">R</text>
 
-                {/* Blue (approx 345°) */}
-                <rect x="160" y="105" width="8" height="8" fill="none" stroke="#3b82f6" strokeWidth="1" />
-                <text x="170" y="112" fill="#3b82f6" fontSize="7" fontFamily="monospace">B</text>
+                {/* Magenta (61°) -> x=131, y=43 */}
+                <rect x="127" y="39" width="8" height="8" fill="none" stroke="#ec4899" strokeWidth="1" />
+                <text x="138" y="46" fill="#ec4899" fontSize="7" fontFamily="monospace" fontWeight="bold">Mg</text>
 
-                {/* Cyan (approx 285°) */}
-                <rect x="110" y="165" width="8" height="8" fill="none" stroke="#06b6d4" strokeWidth="1" />
-                <text x="120" y="172" fill="#06b6d4" fontSize="7" fontFamily="monospace">Cy</text>
+                {/* Blue (347°) -> x=163, y=115 */}
+                <rect x="159" y="111" width="8" height="8" fill="none" stroke="#3b82f6" strokeWidth="1" />
+                <text x="170" y="118" fill="#3b82f6" fontSize="7" fontFamily="monospace" fontWeight="bold">B</text>
 
-                {/* Green (approx 225°) */}
-                <rect x="35" y="145" width="8" height="8" fill="none" stroke="#10b981" strokeWidth="1" />
-                <text x="24" y="152" fill="#10b981" fontSize="7" fontFamily="monospace">G</text>
+                {/* Cyan (284°) -> x=116, y=163 */}
+                <rect x="112" y="159" width="8" height="8" fill="none" stroke="#06b6d4" strokeWidth="1" />
+                <text x="123" y="166" fill="#06b6d4" fontSize="7" fontFamily="monospace" fontWeight="bold">Cy</text>
 
-                {/* Yellow (approx 165°) */}
-                <rect x="25" y="80" width="8" height="8" fill="none" stroke="#eab308" strokeWidth="1" />
-                <text x="15" y="87" fill="#eab308" fontSize="7" fontFamily="monospace">Yl</text>
+                {/* Green (241°) -> x=68, y=157 */}
+                <rect x="64" y="153" width="8" height="8" fill="none" stroke="#10b981" strokeWidth="1" />
+                <text x="52" y="160" fill="#10b981" fontSize="7" fontFamily="monospace" fontWeight="bold">G</text>
+
+                {/* Yellow (167°) -> x=37, y=85 */}
+                <rect x="33" y="81" width="8" height="8" fill="none" stroke="#eab308" strokeWidth="1" />
+                <text x="21" y="88" fill="#eab308" fontSize="7" fontFamily="monospace" fontWeight="bold">Yl</text>
 
                 {/* DYNAMIC CHROMINANCE TRACE (Radar Phosphor Cloud) */}
                 {/* Center baseline fog */}

@@ -7,7 +7,12 @@ import {
   rgbToHsl,
   hexToRgb,
 } from '../utils/colorMath';
-import { HARMONIES_CATALOG, HarmonyInfo } from '../data/harmoniesData';
+import {
+  HARMONIES_CATALOG,
+  HarmonyInfo,
+  CINEMATIC_HARMONY_PALETTES,
+  CinematicHarmonyPalette,
+} from '../data/harmoniesData';
 import {
   generateAseBuffer,
   generateCubeLut,
@@ -23,6 +28,7 @@ import {
   Clapperboard,
   Sliders,
   Sparkles,
+  Palette,
 } from 'lucide-react';
 import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
@@ -44,6 +50,7 @@ export const HarmoniesSection: React.FC<HarmoniesSectionProps> = ({
   const [recipeCategory, setRecipeCategory] = useState<string>('Cinematic Grade');
   const [copiedType, setCopiedType] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [selectedCuratedPaletteId, setSelectedCuratedPaletteId] = useState<string | null>(null);
   const wheelSvgRef = useRef<SVGSVGElement>(null);
 
   const harmonyInfo: HarmonyInfo = HARMONIES_CATALOG[selectedHarmonyType];
@@ -78,6 +85,30 @@ export const HarmoniesSection: React.FC<HarmoniesSectionProps> = ({
       ];
     }
 
+    if (selectedHarmonyType === 'neutral-plus-accent') {
+      const accent = currentBaseHue;
+      return [
+        {
+          name: 'Neutral Deep Shadow (60%)',
+          hex: rgbToHex(...Object.values(hslToRgb(accent, 8, 16)) as [number, number, number]),
+          role: '60% Atmospheric Field',
+          percent: 60,
+        },
+        {
+          name: 'Neutral Midtone Bed (30%)',
+          hex: rgbToHex(...Object.values(hslToRgb(accent, 10, 48)) as [number, number, number]),
+          role: '30% Supporting Tone',
+          percent: 30,
+        },
+        {
+          name: 'Pivotal Saturated Accent (10%)',
+          hex: rgbToHex(...Object.values(hslToRgb(accent, saturation, lightness)) as [number, number, number]),
+          role: '10% Focal Pop Target',
+          percent: 10,
+        },
+      ];
+    }
+
     if (selectedHarmonyType === 'complementary') {
       const h0 = harmonyHues[0];
       const h1 = harmonyHues[1];
@@ -103,37 +134,26 @@ export const HarmoniesSection: React.FC<HarmoniesSectionProps> = ({
       ];
     }
 
-    if (selectedHarmonyType === 'triadic') {
+    if (['tetradic', 'square', 'double-split-complementary', 'compound'].includes(selectedHarmonyType)) {
+      const weights = [50, 25, 15, 10];
       return harmonyHues.map((h, i) => {
-        const percent = i === 0 ? 60 : i === 1 ? 30 : 10;
+        const percent = weights[i] || 10;
         return {
-          name: `Triad Point ${i + 1} (${percent}%)`,
+          name: `Harmonic Point ${i + 1} (${percent}%)`,
           hex: rgbToHex(...Object.values(hslToRgb(h, saturation, lightness)) as [number, number, number]),
-          role: i === 0 ? '60% Key Base' : i === 1 ? '30% Secondary' : '10% Accent',
+          role: i === 0 ? '50% Key Atmosphere' : i === 1 ? '25% Secondary Structure' : `${percent}% Accent & Rim`,
           percent,
         };
       });
     }
 
-    if (selectedHarmonyType === 'tetradic') {
-      return harmonyHues.map((h, i) => {
-        const percent = i === 0 ? 50 : i === 1 ? 25 : i === 2 ? 15 : 10;
-        return {
-          name: `Tetrad Quad ${i + 1} (${percent}%)`,
-          hex: rgbToHex(...Object.values(hslToRgb(h, saturation, lightness)) as [number, number, number]),
-          role: `${percent}% Chord Component`,
-          percent,
-        };
-      });
-    }
-
-    // Analogous
+    // 3-hue schemes: triadic, analogous, split-complementary
     return harmonyHues.map((h, i) => {
-      const percent = i === 1 ? 60 : i === 0 ? 30 : 10;
+      const percent = i === 0 ? 60 : i === 1 ? 25 : 15;
       return {
-        name: i === 1 ? 'Analogous Center (60%)' : i === 0 ? 'Flank A (30%)' : 'Flank B (10%)',
+        name: i === 0 ? `Key Dominant (${percent}%)` : `Harmonic Point ${i + 1} (${percent}%)`,
         hex: rgbToHex(...Object.values(hslToRgb(h, saturation, lightness)) as [number, number, number]),
-        role: `${percent}% Kinship Tone`,
+        role: i === 0 ? '60% Key Base' : i === 1 ? '25% Secondary' : '15% Accent',
         percent,
       };
     });
@@ -229,29 +249,93 @@ export const HarmoniesSection: React.FC<HarmoniesSectionProps> = ({
         </p>
       </div>
 
-      {/* Harmony Type Selector Bar */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-900/80 rounded-xl border border-slate-800/80 overflow-x-auto scrollbar-none">
-        {(
-          [
-            'monochromatic',
-            'complementary',
-            'triadic',
-            'tetradic',
-            'analogous',
-          ] as HarmonyType[]
-        ).map(type => (
-          <button
-            key={type}
-            onClick={() => setSelectedHarmonyType(type)}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors capitalize ${
-              selectedHarmonyType === type
-                ? 'bg-slate-800 text-white shadow-sm ring-1 ring-slate-700'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {HARMONIES_CATALOG[type].title.replace(' Harmony', '')}
-          </button>
-        ))}
+      {/* Curated Hollywood Palettes Quick Loader */}
+      <div className="bg-slate-900/70 p-4 rounded-2xl border border-slate-800 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Palette className="w-4 h-4 text-cyan-400" />
+            <span>Curated Iconic Hollywood Palettes (1-Click Load)</span>
+          </span>
+          <span className="text-[11px] font-mono text-slate-400">12 Cinema Presets</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+          {CINEMATIC_HARMONY_PALETTES.map(p => {
+            const isSelected = selectedCuratedPaletteId === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setSelectedCuratedPaletteId(p.id);
+                  setSelectedHarmonyType(p.scheme);
+                  setCurrentBaseHue(p.baseHue);
+                  setRecipeName(p.name);
+                }}
+                className={`p-2.5 rounded-xl border text-left transition-all space-y-2 ${
+                  isSelected
+                    ? 'bg-slate-800 border-cyan-500/60 shadow-md ring-1 ring-cyan-500/30'
+                    : 'bg-slate-950/60 border-slate-850 hover:bg-slate-850 text-slate-300'
+                }`}
+              >
+                <div className="space-y-0.5">
+                  <div className="text-[11px] font-bold text-white truncate">{p.name}</div>
+                  <div className="text-[9px] text-slate-400 capitalize truncate">{p.scheme} · {p.baseHue}°</div>
+                </div>
+
+                {/* 5-Swatch Ribbon */}
+                <div className="flex h-3.5 rounded overflow-hidden">
+                  {p.swatches.map((swatch, idx) => (
+                    <div key={idx} className="flex-1 h-full" style={{ backgroundColor: swatch }} />
+                  ))}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Harmony Type Selector Bar (All 10 Schemes) */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <span className="font-semibold uppercase text-[10px] tracking-wider text-slate-300">
+            Harmonic Geometric Formulation (10 Mathematical Schemes)
+          </span>
+          <span className="text-[11px] font-mono text-cyan-400">
+            {HARMONIES_CATALOG[selectedHarmonyType].title}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 p-1 bg-slate-900/80 rounded-xl border border-slate-800/80 overflow-x-auto scrollbar-none">
+          {(
+            [
+              'monochromatic',
+              'analogous',
+              'complementary',
+              'split-complementary',
+              'triadic',
+              'tetradic',
+              'square',
+              'double-split-complementary',
+              'compound',
+              'neutral-plus-accent',
+            ] as HarmonyType[]
+          ).map(type => (
+            <button
+              key={type}
+              onClick={() => {
+                setSelectedHarmonyType(type);
+                setSelectedCuratedPaletteId(null);
+              }}
+              className={`px-3 py-2 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors capitalize ${
+                selectedHarmonyType === type
+                  ? 'bg-slate-800 text-white shadow-sm ring-1 ring-cyan-500/40'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {HARMONIES_CATALOG[type].title.replace(' Harmony', '')}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Main Grid: Interactive Color Wheel & Harmony Details */}

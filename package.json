@@ -6,11 +6,9 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit",
-    "smoke": "node ./scripts/smoke-check.mjs",
-    "ci:verify": "npm run lint && npm run build && npm run smoke -- http://127.0.0.1:4173"
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

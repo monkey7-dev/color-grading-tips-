@@ -14,10 +14,39 @@ export interface ColorWheelVal {
   lum: number; // -100 to 100 IRE luminance adjustment
 }
 
+export interface ResolvedGrade {
+  exposure: number;
+  kelvin: number;
+  tint: number;
+  contrast: number;
+  saturation: number;
+  lift: { r: number; g: number; b: number; master?: number };
+  gamma: { r: number; g: number; b: number; master?: number };
+  gain: { r: number; g: number; b: number; master?: number };
+  offset: { r: number; g: number; b: number };
+  sCurve?: { shadows?: number; midtones?: number; highlights?: number };
+}
+
+export interface FilmStockMetadata {
+  manufacturer: string;
+  format: string;
+  iso: number;
+  balance: string;
+  balanceKelvin: number | null;
+  grain: string;
+  character: string;
+  shadowTint: string;
+  highlightTint: string;
+  skinRendering: string;
+  approxDynamicRangeStops: number;
+  availabilityNote: string;
+  bestFor: string[];
+}
+
 export interface CinemaGradeParams {
   id: string;
   name: string;
-  sceneType: 'day' | 'night' | 'film_stock';
+  sceneType: 'day' | 'night' | 'film_stock' | 'stylized' | 'vintage' | 'genre' | 'atmospheric' | string;
   timeframe: string;
   kelvin: number; // 2000K to 10000K
   tint: number; // -50 (green) to +50 (magenta)
@@ -42,6 +71,11 @@ export interface CinemaGradeParams {
     ratio: string;
   };
   resolveTip: string;
+  resolvedGrade?: ResolvedGrade;
+  filmStockInfo?: FilmStockMetadata;
+  useCases?: string[];
+  cautions?: string[];
+  tags?: string[];
 }
 
 /**

@@ -11,6 +11,7 @@ import {
   DAY_CINEMA_GRADES,
   NIGHT_CINEMA_GRADES,
   FILM_STOCK_GRADES,
+  STYLIZED_CINEMA_GRADES,
   ALL_RECOMMENDED_GRADES,
 } from '../data/cinemaGradesData';
 import {
@@ -51,9 +52,10 @@ import {
   ShieldCheck,
   RotateCcw,
   Sliders,
+  AlertTriangle,
 } from 'lucide-react';
 
-type WorkflowMode = 'day' | 'night' | 'day_to_night' | 'film_stock' | 'landscape';
+type WorkflowMode = 'day' | 'night' | 'day_to_night' | 'film_stock' | 'stylized' | 'landscape';
 
 interface CinemaSampleFrame {
   id: string;
@@ -769,6 +771,80 @@ Target Palette: Shadows=${activeScenario.recommendedHexes.shadows}, Midtones=${a
                   </div>
                 </div>
               </div>
+
+              {/* Photochemical Film Stock Specifications (when film stock is selected) */}
+              {activeScenario.filmStockInfo && (
+                <div className="bg-slate-950/80 rounded-xl border border-rose-950/50 p-5 space-y-4 text-xs">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Film className="w-4 h-4 text-rose-400" />
+                      <span className="font-bold text-white text-sm">
+                        Photochemical Emulation Architecture ({activeScenario.filmStockInfo.manufacturer} {activeScenario.filmStockInfo.format})
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-mono text-rose-300">
+                      ISO {activeScenario.filmStockInfo.iso} · {activeScenario.filmStockInfo.balance}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-1">
+                      <span className="text-slate-400 font-bold uppercase text-[10px]">Dynamic Range &amp; Grain</span>
+                      <p className="text-white font-medium">~{activeScenario.filmStockInfo.approxDynamicRangeStops} Stops Latitude</p>
+                      <p className="text-[11px] text-slate-400">Grain Profile: <span className="text-slate-200 capitalize">{activeScenario.filmStockInfo.grain}</span></p>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-1">
+                      <span className="text-slate-400 font-bold uppercase text-[10px]">Shadow &amp; Highlight Tinting</span>
+                      <p className="text-cyan-300 text-[11px]">{activeScenario.filmStockInfo.shadowTint}</p>
+                      <p className="text-amber-300 text-[11px]">{activeScenario.filmStockInfo.highlightTint}</p>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-1">
+                      <span className="text-slate-400 font-bold uppercase text-[10px]">Skin Tone Rendering</span>
+                      <p className="text-slate-200 text-[11px] leading-relaxed">{activeScenario.filmStockInfo.skinRendering}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-850 text-[11px]">
+                    <div className="text-slate-400">
+                      <strong className="text-white">Best For:</strong> {activeScenario.filmStockInfo.bestFor.join(' · ')}
+                    </div>
+                    <div className="text-slate-500 font-mono text-[10px]">
+                      {activeScenario.filmStockInfo.availabilityNote}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Use Cases & Colorist Cautions (when present) */}
+              {(activeScenario.useCases || activeScenario.cautions) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  {activeScenario.useCases && (
+                    <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-1.5">
+                      <span className="font-bold text-white flex items-center gap-1.5 text-xs">
+                        <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Recommended Cinema Genres &amp; Narrative Arcs</span>
+                      </span>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {activeScenario.useCases.join(' · ')}
+                      </p>
+                    </div>
+                  )}
+
+                  {activeScenario.cautions && (
+                    <div className="p-4 bg-slate-950/60 rounded-xl border border-amber-950/40 space-y-1.5">
+                      <span className="font-bold text-amber-300 flex items-center gap-1.5 text-xs">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Colorist Caution &amp; Quality Watchout</span>
+                      </span>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {activeScenario.cautions.join(' · ')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Software Recreation Guide (DaVinci Resolve & Lightroom) */}
               <div className="bg-slate-950/90 rounded-xl border border-slate-800 p-5 space-y-4 text-xs">

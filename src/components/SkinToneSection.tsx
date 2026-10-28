@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   SKIN_ETHNICITY_PRESETS,
   SkinEthnicityPreset,
+  SKIN_GRADING_RULES,
+  SkinGradingRule,
 } from '../data/skinToneData';
 import {
   analyzeSkinSamples,
@@ -20,6 +22,8 @@ import {
   Sparkles,
   Camera,
   RefreshCw,
+  ShieldCheck,
+  BookOpen,
 } from 'lucide-react';
 import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
 
@@ -79,7 +83,6 @@ export const SkinToneSection: React.FC = () => {
 
         // Sample skin pixels
         const detectedSkin: RGB[] = [];
-        // Step with stride to sample ~300-600 representative pixels
         const stride = 4 * 4; // every 4th pixel
         for (let i = 0; i < data.length; i += stride) {
           const r = data[i];
@@ -91,12 +94,10 @@ export const SkinToneSection: React.FC = () => {
         }
 
         if (detectedSkin.length > 0) {
-          // Keep up to 400 points
           const sampled = detectedSkin.filter((_, idx) => idx % Math.max(1, Math.floor(detectedSkin.length / 350)) === 0);
           setCustomPixelSamples(sampled);
           setUploadedImageUrl(event.target?.result as string);
         } else {
-          // If no pure skin pixel detected (e.g. cartoon), sample general warm pixels
           alert('Could not detect distinct human skin tones in this image. Falling back to preset skin analysis.');
         }
         setIsAnalyzing(false);
@@ -117,11 +118,14 @@ export const SkinToneSection: React.FC = () => {
   const scopeCenter = scopeSize / 2;
   const scopeRadius = (scopeSize / 2) - 18;
 
-  // 135° Skin Tone Line end coordinate on vectorscope
-  // Standard Rec.709 skin tone vector sits at 135° (or 10:30 on the clock)
+  // 135° Classic and 123° Broadcast I-Line coordinates
   const skinLineRad = (135 * Math.PI) / 180;
   const skinLineX = scopeCenter + Math.cos(skinLineRad) * (scopeRadius * 0.95);
   const skinLineY = scopeCenter - Math.sin(skinLineRad) * (scopeRadius * 0.95);
+
+  const broadcastRad = (123 * Math.PI) / 180;
+  const broadcastLineX = scopeCenter + Math.cos(broadcastRad) * (scopeRadius * 0.95);
+  const broadcastLineY = scopeCenter - Math.sin(broadcastRad) * (scopeRadius * 0.95);
 
   // Color targets on vectorscope (Red, Magenta, Blue, Cyan, Green, Yellow)
   const targets = [
@@ -322,24 +326,50 @@ export const SkinToneSection: React.FC = () => {
                 );
               })}
 
-              {/* THE SACRED 135° SKIN TONE LINE (I-LINE) */}
+              {/* ±8° Skin Tone Tolerance Wedge (115° to 131°) */}
+              <path
+                d={`M ${scopeCenter} ${scopeCenter} L ${scopeCenter + Math.cos(115 * Math.PI / 180) * (scopeRadius * 0.95)} ${scopeCenter - Math.sin(115 * Math.PI / 180) * (scopeRadius * 0.95)} A ${scopeRadius * 0.95} ${scopeRadius * 0.95} 0 0 1 ${scopeCenter + Math.cos(131 * Math.PI / 180) * (scopeRadius * 0.95)} ${scopeCenter - Math.sin(131 * Math.PI / 180) * (scopeRadius * 0.95)} Z`}
+                fill="#f59e0b"
+                fillOpacity="0.08"
+              />
+
+              {/* 123° Broadcast Standard I-Line */}
+              <line
+                x1={scopeCenter}
+                y1={scopeCenter}
+                x2={broadcastLineX}
+                y2={broadcastLineY}
+                stroke="#f59e0b"
+                strokeWidth="2.5"
+                opacity={0.95}
+              />
+              <text
+                x={broadcastLineX - 4}
+                y={broadcastLineY - 4}
+                textAnchor="end"
+                className="text-[9px] font-mono font-bold fill-amber-400"
+              >
+                I-Line (123°)
+              </text>
+
+              {/* 135° Classic Reference Line */}
               <line
                 x1={scopeCenter}
                 y1={scopeCenter}
                 x2={skinLineX}
                 y2={skinLineY}
-                stroke="#f59e0b"
-                strokeWidth="2.5"
-                strokeDasharray="4 2"
-                opacity={0.95}
+                stroke="#fbbf24"
+                strokeWidth="1.2"
+                strokeDasharray="3 2"
+                opacity={0.6}
               />
               <text
                 x={skinLineX - 4}
                 y={skinLineY - 4}
                 textAnchor="end"
-                className="text-[9px] font-mono font-bold fill-amber-400"
+                className="text-[7.5px] font-mono fill-amber-300 opacity-60"
               >
-                Skin Line (135°)
+                135°
               </text>
 
               {/* Scatter Plot Points of Real Analyzed Skin Samples */}
@@ -560,6 +590,46 @@ export const SkinToneSection: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* The 7 Golden Rules of Professional Skin Tone Grading */}
+      <div className="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 space-y-5 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-amber-400" />
+            <h3 className="text-base font-bold text-white">
+              The 7 Golden Rules of Hollywood Skin Tone Grading
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-slate-400">
+            SMPTE Broadcast Standards &amp; Melanin Physics
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {SKIN_GRADING_RULES.map(rule => (
+            <div
+              key={rule.number}
+              className="p-4 bg-slate-950/70 rounded-xl border border-slate-800 space-y-2 text-xs"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 font-bold font-mono text-[11px] flex items-center justify-center shrink-0">
+                  {rule.number}
+                </span>
+                <span className="font-bold text-white text-xs">{rule.title}</span>
+              </div>
+              <p className="text-amber-200/90 font-medium text-[11px] leading-relaxed">
+                {rule.rule}
+              </p>
+              <p className="text-slate-400 text-[11px] leading-relaxed">
+                <strong className="text-slate-300">Why It Matters:</strong> {rule.whyItMatters}
+              </p>
+              <div className="p-2.5 bg-slate-900/80 rounded-lg border border-slate-800/80 text-[10.5px] text-cyan-300 font-mono leading-relaxed">
+                <strong className="text-cyan-400">DaVinci Action:</strong> {rule.resolveAction}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -57,8 +57,11 @@ test('getHarmonyHues generates correct angles for harmonies', () => {
   const triadic = getHarmonyHues(0, 'triadic');
   assert.deepEqual(triadic, [0, 120, 240]);
 
+  const square = getHarmonyHues(45, 'square');
+  assert.deepEqual(square, [45, 135, 225, 315]);
+
   const tetradic = getHarmonyHues(45, 'tetradic');
-  assert.deepEqual(tetradic, [45, 135, 225, 315]);
+  assert.deepEqual(tetradic, [45, 105, 225, 285]);
 
   const analogous = getHarmonyHues(180, 'analogous');
   assert.deepEqual(analogous, [150, 180, 210]);

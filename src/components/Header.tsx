@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Compass, Eye, Film, User, BookOpen, Box, BarChart3 } from 'lucide-react';
+import { Palette, Compass, Eye, Film, User, BookOpen, Box } from 'lucide-react';
 
 export type ActiveTab =
   | 'psychology'
@@ -8,8 +8,7 @@ export type ActiveTab =
   | 'accessibility'
   | 'cinematography'
   | 'skintones'
-  | 'library'
-  | 'insights';
+  | 'library';
 
 interface HeaderProps {
   activeTab: ActiveTab;
@@ -38,12 +37,12 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'cinematography', label: 'Cinematography', icon: <Film className="w-4 h-4" /> },
     { id: 'skintones', label: 'Skin Tones', icon: <User className="w-4 h-4" /> },
     { id: 'library', label: 'Library', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'insights', label: 'Insights', icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
   return (
     <header className="sticky top-0 z-40 bg-[#090d16]/95 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 lg:gap-8">
+        {/* Zone 1: Brand wordmark (single text element) */}
         <div className="flex items-center gap-2.5 shrink-0">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-cyan-500 p-0.5 flex items-center justify-center">
             <div className="w-full h-full bg-[#090d16] rounded-[6px] flex items-center justify-center">
@@ -57,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
 
+        {/* Zone 2: Navigation Links (single line, clean buttons with active states) */}
         <nav
           aria-label="Main Navigation"
           className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800/60"
@@ -80,11 +80,13 @@ export const Header: React.FC<HeaderProps> = ({
           })}
         </nav>
 
+        {/* Zone 3: Header Actions (Google Drive, Install App, Saved Recipes) */}
         <div className="flex items-center gap-2 shrink-0">
+          {/* Google Drive Sync Button */}
           <button
             onClick={onOpenGoogleDrive}
             aria-label="Open Google Drive cloud sync"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:text-white bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/70 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:text-white bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/70 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow-sm"
             title="Google Drive Cloud Sync & LUT Storage"
           >
             <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
@@ -96,10 +98,11 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </button>
 
+          {/* Install App Guide Button */}
           <button
             onClick={onOpenInstallGuide}
             aria-label="How to install app"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-lg transition-colors whitespace-nowrap shrink-0"
             title="How to install as Desktop or Mobile app"
           >
             <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,11 +111,11 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline">Install App</span>
           </button>
 
+          {/* Saved Recipes Button */}
           <button
             onClick={onOpenSavedRecipes}
             aria-label="Open saved recipes library"
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-750 hover:text-white border border-slate-700/80 rounded-lg transition-colors"
-            title="Saved recipe collection"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-750 hover:text-white border border-slate-700/80 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow-sm"
           >
             <Compass className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">Saved Recipes</span>
@@ -125,6 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
+      {/* Mobile nav strip */}
       <div className="md:hidden flex items-center gap-1 mt-2.5 overflow-x-auto pb-1 scrollbar-none">
         {tabs.map(tab => {
           const isActive = activeTab === tab.id;
@@ -147,5 +151,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
-export default Header;

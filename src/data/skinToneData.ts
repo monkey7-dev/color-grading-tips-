@@ -178,3 +178,80 @@ export const SKIN_ETHNICITY_PRESETS: SkinEthnicityPreset[] = [
     ],
   },
 ];
+
+export const SKIN_LINE_STANDARDS = {
+  appDefaultDeg: 135,
+  broadcastILineDeg: 123,
+  toleranceDeg: 8,
+  rec709BarsPercent: 75,
+};
+
+export const VECTORSCOPE_TARGETS = {
+  R: 104,
+  Mg: 61,
+  B: 347,
+  Cy: 284,
+  G: 241,
+  Yl: 167,
+};
+
+export interface SkinGradingRule {
+  number: number;
+  title: string;
+  rule: string;
+  whyItMatters: string;
+  resolveAction: string;
+}
+
+export const SKIN_GRADING_RULES: SkinGradingRule[] = [
+  {
+    number: 1,
+    title: 'The Invariant Vectorscope Skin Line',
+    rule: 'All human skin tones—regardless of race, ethnicity, or melanin depth—fall along the exact same angle on the vectorscope (~123° Broadcast / 135° Wheel).',
+    whyItMatters: 'Human skin pigmentation varies by melanin density and hemoglobin flush, but the hue angle remains virtually identical because human blood and melanin share identical chemical absorption wavelengths.',
+    resolveAction: 'Isolate skin with the Qualifier pipette. Check vectorscope graticule; rotate Hue vs Hue until the scatter trace aligns squarely within the ±8° tolerance band along the I-Line.',
+  },
+  {
+    number: 2,
+    title: 'Respect Melanin Luminance Levels (Do Not Over-Expose)',
+    rule: 'Do not attempt to push deep skin tones (Types V-VI) up to fair skin luminance (60-70 IRE). Fair skin sits at 55-70 IRE; olive at 40-55 IRE; deep African skin at 20-35 IRE.',
+    whyItMatters: 'Artificially brightening deep skin destroys contrast, turns rich espresso into pasty chalky gray, and induces noise artifacts.',
+    resolveAction: 'Set base exposure to honor the natural IRE tier. Sculpt with broad soft specular key reflections rather than boosting master gain.',
+  },
+  {
+    number: 3,
+    title: 'Specular Sheen Defines Dark Skin',
+    rule: 'Dark skin is sculpted primarily by polarized specular reflections (the sheen of skin oils, moisturizer, and large light sources), not diffuse reflection.',
+    whyItMatters: 'High melanin absorbs diffuse light. A large 12x12 diffusion frame or soft skylight will create breathtaking silver-gold cheekbone highlights that define facial anatomy.',
+    resolveAction: 'In Resolve, use Highlight Soft Clip and subtle Midtone Detail (+10 to +15) on a parallel node to enhance specular texture without blowing out.',
+  },
+  {
+    number: 4,
+    title: 'Protect Midtone Falloff from Cyan Contamination',
+    rule: 'In teal-and-orange grades, cold shadows often bleed into the skin edge/terminator (the shadow transition on the neck and cheek).',
+    whyItMatters: 'Cyan in shadow falloff makes actors look zombie-like, hypothermic, or poisoned.',
+    resolveAction: 'In the Lift wheel or Hue vs Sat curve, desaturate cyan/green shadows below 20 IRE, or use an inverted 3D Qualifier to mask skin out of the cool shadow node.',
+  },
+  {
+    number: 5,
+    title: 'Targeted Hue vs Hue Over Global Temperature Shifts',
+    rule: 'Never try to fix an actor’s sickly skin tone using the master White Balance / Tint controls if the background is already correctly balanced.',
+    whyItMatters: 'Master temperature/tint alters the entire frame, shifting whites, skies, and shadows simultaneously.',
+    resolveAction: 'Use the Hue vs Hue curve in Resolve. Sample the yellowish skin tone (around 50°) and nudge it toward red (around 35°) to restore natural blood warmth without touching walls or clothing.',
+  },
+  {
+    number: 6,
+    title: 'Preserve Sub-Surface Scattering & Micro-Flushes',
+    rule: 'Ears, fingertips, nostrils, and lips have thinner epidermal layers with concentrated capillary networks that naturally glow with more red/magenta than foreheads or cheeks.',
+    whyItMatters: 'Aggressive skin smoothing or uniform color qualification flattens faces into plastic mannequins.',
+    resolveAction: 'Keep qualification soft (High Softness 15-25 on the qualifier). Avoid harsh masks that strip ear glow.',
+  },
+  {
+    number: 7,
+    title: 'Grade Skin on a Parallel or Upstream Protected Node',
+    rule: 'Always isolate and correct skin either upstream of your creative LUT/look or on a dedicated parallel node that preserves skin fidelity.',
+    whyItMatters: 'Heavy creative looks (bleach bypass, matrix green, cross-process) destroy human skin plausibility unless skin is protected on a parallel branch.',
+    resolveAction: 'Build a Parallel Node Mixer in Resolve: Branch A handles background/environment creative look; Branch B qualifies skin and blends it back with Key Output Gain ~0.7-0.85.',
+  },
+];
+

@@ -16,10 +16,15 @@ export interface HSL {
 
 export type HarmonyType =
   | 'monochromatic'
+  | 'analogous'
   | 'complementary'
+  | 'split-complementary'
   | 'triadic'
   | 'tetradic'
-  | 'analogous';
+  | 'square'
+  | 'double-split-complementary'
+  | 'compound'
+  | 'neutral-plus-accent';
 
 export type ColorBlindnessType =
   | 'normal'
@@ -163,15 +168,25 @@ export function getHarmonyHues(baseHue: number, type: HarmonyType): number[] {
   const norm = ((baseHue % 360) + 360) % 360;
   switch (type) {
     case 'monochromatic':
+    case 'neutral-plus-accent':
       return [norm];
     case 'complementary':
       return [norm, (norm + 180) % 360];
+    case 'split-complementary':
+      return [norm, (norm + 150) % 360, (norm + 210) % 360];
     case 'triadic':
       return [norm, (norm + 120) % 360, (norm + 240) % 360];
     case 'tetradic':
+      return [norm, (norm + 60) % 360, (norm + 180) % 360, (norm + 240) % 360];
+    case 'square':
       return [norm, (norm + 90) % 360, (norm + 180) % 360, (norm + 270) % 360];
+    case 'double-split-complementary':
+    case 'compound':
+      return [norm, (norm + 30) % 360, (norm + 180) % 360, (norm + 210) % 360];
     case 'analogous':
       return [((norm - 30) + 360) % 360, norm, (norm + 30) % 360];
+    default:
+      return [norm];
   }
 }
 
