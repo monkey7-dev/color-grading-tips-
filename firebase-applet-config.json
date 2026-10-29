@@ -1,11 +1,12 @@
 {
-  "projectId": "YOUR_FIREBASE_PROJECT_ID",
-  "appId": "YOUR_FIREBASE_APP_ID",
-  "apiKey": "YOUR_FIREBASE_API_KEY",
-  "authDomain": "YOUR_FIREBASE_AUTH_DOMAIN",
-  "storageBucket": "YOUR_FIREBASE_STORAGE_BUCKET",
-  "messagingSenderId": "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-  "measurementId": "YOUR_FIREBASE_MEASUREMENT_ID",
-  "oAuthClientId": "YOUR_FIREBASE_OAUTH_CLIENT_ID",
-  "recaptchaSiteKey": "YOUR_FIREBASE_RECAPTCHA_SITE_KEY"
+  "projectId": "forward-scion-c01dl",
+  "appId": "1:423555250090:web:6be7d0ece8a9d8abc51dd3",
+  "apiKey": "AIzaSyCHOz4CBJuTXzLnX9n9ak9XSzURKudP8gc",
+  "authDomain": "forward-scion-c01dl.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-theultimatecolor-95fb5fb7-191f-482f-ba52-803ecc467104",
+  "storageBucket": "forward-scion-c01dl.firebasestorage.app",
+  "messagingSenderId": "423555250090",
+  "measurementId": "",
+  "oAuthClientId": "423555250090-o0f2ggl67scliiios4eloacg6sf531tq.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }

@@ -2,7 +2,7 @@
  * The Ultimate Color Psychology & Cinematography Matrix
  * An interactive masterclass exploring color psychology, cinematic harmonies,
  * accessibility simulation, DaVinci Resolve workflows, natural skin tone precision,
- * and academic color theory.
+ * 3D Studio Lighting Stages, and academic color theory.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,13 +13,17 @@ import { AccessibilitySection } from './components/AccessibilitySection';
 import { CinematographySection } from './components/CinematographySection';
 import { SkinToneSection } from './components/SkinToneSection';
 import { LibrarySection } from './components/LibrarySection';
-import { ThreeColorUniverse } from './components/ThreeColorUniverse';
+import { PhotoColorGradingStudio } from './components/PhotoColorGradingStudio';
+import { ThreeCinemaStage } from './components/ThreeCinemaStage';
 import { RecipeModal } from './components/RecipeModal';
 import { GoogleDriveModal } from './components/GoogleDriveModal';
 import { InstallModal } from './components/InstallModal';
+import { SearchGroundingCinematographyModal } from './components/SearchGroundingCinematographyModal';
 import { initAuth } from './services/googleDriveAuth';
 import { ColorRecipe } from './utils/exporters';
 import { hexToRgb, rgbToHsl } from './utils/colorMath';
+import { useAuth } from './context/AuthContext';
+import { getUserPalettes, saveUserPalette } from './services/userColorStorage';
 
 const INITIAL_RECIPES: ColorRecipe[] = [
   {
@@ -82,7 +86,10 @@ export default function App() {
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState<boolean>(false);
   const [isGoogleDriveModalOpen, setIsGoogleDriveModalOpen] = useState<boolean>(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
+  const [isSearchGroundingModalOpen, setIsSearchGroundingModalOpen] = useState<boolean>(false);
   const [isDriveConnected, setIsDriveConnected] = useState<boolean>(false);
+
+  const { user } = useAuth();
 
   // Check Drive auth connection state
   useEffect(() => {
@@ -104,6 +111,40 @@ export default function App() {
     return INITIAL_RECIPES;
   });
 
+  // Sync with Firestore when user logs in
+  useEffect(() => {
+    if (!user) return;
+
+    let isMounted = true;
+    getUserPalettes(user.uid)
+      .then(firestorePalettes => {
+        if (!isMounted || !firestorePalettes.length) return;
+        setSavedRecipes(prev => {
+          const map = new Map<string, ColorRecipe>();
+          prev.forEach(r => map.set(r.id, r));
+          firestorePalettes.forEach(fp => {
+            map.set(fp.id, {
+              id: fp.id,
+              name: fp.title,
+              category: fp.genre || 'Cloud Saved',
+              harmonyType: fp.mood || 'Palette',
+              swatches: (fp.swatches || []).map(s => ({ name: s.role || s.name || 'Tone', hex: s.hex })),
+              description: fp.tagline,
+              createdAt: fp.createdAt ? new Date().toISOString() : new Date().toISOString(),
+            });
+          });
+          return Array.from(map.values());
+        });
+      })
+      .catch(err => {
+        console.warn('Could not retrieve cloud palettes from Firestore:', err?.message);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   useEffect(() => {
     try {
       localStorage.setItem('cm_saved_recipes', JSON.stringify(savedRecipes));
@@ -122,6 +163,17 @@ export default function App() {
 
   const handleSaveRecipe = (recipe: ColorRecipe) => {
     setSavedRecipes(prev => [recipe, ...prev.filter(r => r.id !== recipe.id)]);
+    // If logged in, also persist to Firestore
+    if (user) {
+      saveUserPalette(user.uid, {
+        id: recipe.id,
+        title: recipe.name,
+        tagline: recipe.description || recipe.harmonyType,
+        genre: recipe.category,
+        mood: recipe.harmonyType,
+        swatches: recipe.swatches.map(s => ({ hex: s.hex, name: s.name, role: s.name })),
+      }).catch(err => console.warn('Could not auto-sync recipe to Firestore:', err?.message));
+    }
   };
 
   const handleDeleteRecipe = (id: string) => {
@@ -135,13 +187,12 @@ export default function App() {
       setCurrentBaseHue(hsl.h);
       setActiveTab('harmonies');
     }
-    // Also ensure recipe is saved into local library if imported from Drive
     setSavedRecipes(prev => [recipe, ...prev.filter(r => r.id !== recipe.id)]);
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
-      {/* Top Bar Header */}
+    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-white">
+      {/* Universal Header with Navigation, Firebase Auth, and Drive */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -149,6 +200,7 @@ export default function App() {
         savedCount={savedRecipes.length}
         onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
         onOpenInstallGuide={() => setIsInstallModalOpen(true)}
+        onOpenSearchGrounding={() => setIsSearchGroundingModalOpen(true)}
         isDriveConnected={isDriveConnected}
       />
 
@@ -158,7 +210,11 @@ export default function App() {
           <PsychologySection onLoadIntoWheel={handleLoadColorIntoWheel} />
         )}
 
-        {activeTab === 'three_universe' && <ThreeColorUniverse />}
+        {(activeTab === 'photo_grader' || activeTab === 'three_universe') && (
+          <PhotoColorGradingStudio />
+        )}
+
+        {activeTab === 'three_cinema' && <ThreeCinemaStage />}
 
         {activeTab === 'harmonies' && (
           <HarmoniesSection
@@ -185,47 +241,29 @@ export default function App() {
             <span aria-hidden="true">·</span>
             <span>Based on Rec.709, WCAG 2.1, and Josef Albers Foundations</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <button
-              onClick={() => setActiveTab('psychology')}
-              className="hover:text-white transition-colors"
-            >
+          <div className="flex items-center gap-4 text-slate-400 flex-wrap">
+            <button onClick={() => setActiveTab('psychology')} className="hover:text-white transition-colors">
               Psychology
             </button>
-            <button
-              onClick={() => setActiveTab('three_universe')}
-              className="hover:text-white transition-colors text-cyan-400"
-            >
-              3D Universe
+            <button onClick={() => setActiveTab('photo_grader')} className="hover:text-white transition-colors text-cyan-400">
+              Photo Grader
             </button>
-            <button
-              onClick={() => setActiveTab('harmonies')}
-              className="hover:text-white transition-colors"
-            >
+            <button onClick={() => setActiveTab('three_cinema')} className="hover:text-white transition-colors text-amber-400 font-semibold">
+              3D Cinema Stage
+            </button>
+            <button onClick={() => setActiveTab('harmonies')} className="hover:text-white transition-colors">
               Harmonies
             </button>
-            <button
-              onClick={() => setActiveTab('accessibility')}
-              className="hover:text-white transition-colors"
-            >
+            <button onClick={() => setActiveTab('accessibility')} className="hover:text-white transition-colors">
               Accessibility
             </button>
-            <button
-              onClick={() => setActiveTab('cinematography')}
-              className="hover:text-white transition-colors"
-            >
+            <button onClick={() => setActiveTab('cinematography')} className="hover:text-white transition-colors">
               Cinematography
             </button>
-            <button
-              onClick={() => setActiveTab('skintones')}
-              className="hover:text-white transition-colors"
-            >
+            <button onClick={() => setActiveTab('skintones')} className="hover:text-white transition-colors">
               Skin Tones
             </button>
-            <button
-              onClick={() => setActiveTab('library')}
-              className="hover:text-white transition-colors"
-            >
+            <button onClick={() => setActiveTab('library')} className="hover:text-white transition-colors">
               Library
             </button>
           </div>
@@ -253,6 +291,17 @@ export default function App() {
       <InstallModal
         isOpen={isInstallModalOpen}
         onClose={() => setIsInstallModalOpen(false)}
+      />
+
+      {/* Google Search Grounding Cinematography Modal */}
+      <SearchGroundingCinematographyModal
+        isOpen={isSearchGroundingModalOpen}
+        onClose={() => setIsSearchGroundingModalOpen(false)}
+        onApplyPaletteToWheels={swatches => {
+          if (swatches && swatches[0]) {
+            handleLoadColorIntoWheel(swatches[0]);
+          }
+        }}
       />
     </div>
   );

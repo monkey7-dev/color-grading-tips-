@@ -31,6 +31,7 @@ import {
   Palette,
 } from 'lucide-react';
 import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
+import { InteractiveColorMixer } from './InteractiveColorMixer';
 
 interface HarmoniesSectionProps {
   currentBaseHue: number;
@@ -794,6 +795,16 @@ export const HarmoniesSection: React.FC<HarmoniesSectionProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Interactive Color Mixer Component (Hex, RGB, HSL with Psychological & Cinema Analysis) */}
+      <InteractiveColorMixer
+        initialHex={swatches[0]?.hex || '#f59e0b'}
+        onSendToHarmonies={hex => {
+          const rgb = hexToRgb(hex);
+          const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+          setCurrentBaseHue(hsl.h);
+        }}
+      />
 
       {/* Dynamic Software Grading & Export Guide for Current Harmony */}
       <PostProductionSoftwareGuide

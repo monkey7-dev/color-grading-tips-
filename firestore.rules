@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // User profile: only owner can read and write
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // User's custom color grades
+      match /savedGrades/{gradeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // User's saved cinematic palettes
+      match /savedPalettes/{paletteId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

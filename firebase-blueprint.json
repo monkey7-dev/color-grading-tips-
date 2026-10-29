@@ -1,0 +1,72 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered user profile information",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastActiveAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email"]
+    },
+    "SavedColorGrade": {
+      "title": "SavedColorGrade",
+      "description": "User custom cinematic grade with 3-way color wheel values and balance settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "sceneType": { "type": "string" },
+        "kelvin": { "type": "number" },
+        "tint": { "type": "number" },
+        "contrast": { "type": "number" },
+        "saturation": { "type": "number" },
+        "lift": { "type": "object" },
+        "gamma": { "type": "object" },
+        "gain": { "type": "object" },
+        "swatches": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "name", "kelvin", "contrast", "saturation"]
+    },
+    "SavedPalette": {
+      "title": "SavedPalette",
+      "description": "User saved cinematic or AI-generated color harmony palette",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "tagline": { "type": "string" },
+        "genre": { "type": "string" },
+        "mood": { "type": "string" },
+        "swatches": { "type": "array" },
+        "filmReferences": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "swatches"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile document"
+    },
+    "/users/{userId}/savedGrades/{gradeId}": {
+      "schema": { "$ref": "#/entities/SavedColorGrade" },
+      "description": "User custom saved color grades and film looks"
+    },
+    "/users/{userId}/savedPalettes/{paletteId}": {
+      "schema": { "$ref": "#/entities/SavedPalette" },
+      "description": "User saved cinematic color palettes"
+    }
+  }
+}

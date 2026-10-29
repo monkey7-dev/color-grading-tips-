@@ -33,6 +33,7 @@ import { LandscapeGradingStudio } from './LandscapeGradingStudio';
 import { DayToNightLab } from './DayToNightLab';
 import { SoftwareGradingGuideModal } from './SoftwareGradingGuideModal';
 import { PostProductionSoftwareGuide } from './PostProductionSoftwareGuide';
+import { GeminiCinematicPaletteModal } from './GeminiCinematicPaletteModal';
 import { SCENARIO_SOFTWARE_MANUALS } from '../data/softwareWorkflowsData';
 import {
   Sun,
@@ -151,6 +152,7 @@ export const CinematographySection: React.FC = () => {
   const [activeNodeFilter, setActiveNodeFilter] = useState<'all' | 'primary' | 'curves' | 'advanced'>('all');
   const [isSoftwareModalOpen, setIsSoftwareModalOpen] = useState<boolean>(false);
   const [inlineSoftwareTab, setInlineSoftwareTab] = useState<'davinci' | 'lightroom'>('davinci');
+  const [isGeminiModalOpen, setIsGeminiModalOpen] = useState<boolean>(false);
 
   // Active recommended scenario object
   const activeScenario: CinemaGradeParams = useMemo(() => {
@@ -399,6 +401,15 @@ Target Palette: Shadows=${activeScenario.recommendedHexes.shadows}, Midtones=${a
           {/* Quick Action Badges */}
           <div className="flex items-center gap-2 flex-wrap self-start md:self-auto">
             <button
+              onClick={() => setIsGeminiModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 shadow-md shadow-cyan-950/40 flex items-center gap-1.5 transition-all ring-1 ring-white/20"
+              title="Generate cinematic color palettes from any movie mood or genre using Gemini AI"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
+              <span>AI Mood &amp; Genre Palette (Gemini)</span>
+            </button>
+
+            <button
               onClick={handleExportCube}
               className="px-3 py-2 rounded-xl text-xs font-bold text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-800/80 shadow-md flex items-center gap-1.5 transition-colors"
               title="Download 17x17x17 3D LUT for DaVinci Resolve, Premiere Pro, Final Cut"
@@ -506,6 +517,38 @@ Target Palette: Shadows=${activeScenario.recommendedHexes.shadows}, Midtones=${a
         >
           <Mountain className="w-4 h-4 text-emerald-400" />
           <span>Atmospheric Depth Studio</span>
+        </button>
+      </div>
+
+      {/* Gemini AI Mood & Genre Quick Generator Banner */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-900/60 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-500 p-0.5 shrink-0 mt-0.5 shadow-md shadow-cyan-900/30">
+            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-cyan-400" />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-sm sm:text-base text-white tracking-tight">
+                Gemini AI Cinematic Palette Studio
+              </span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+                gemini-3.8-flash
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              Generate custom Hollywood color palettes, DaVinci Resolve Lift/Gamma/Gain wheel coordinates, and physical lighting recipes from any movie mood, genre keyword, or director aesthetic (e.g. <em>"Cyberpunk rain"</em>, <em>"A24 folk horror"</em>, <em>"70s sun-bleached giallo"</em>).
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsGeminiModalOpen(true)}
+          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-950 transition-all shrink-0 self-start md:self-auto ring-1 ring-white/20"
+        >
+          <Sparkles className="w-4 h-4 text-cyan-200" />
+          <span>Generate with Gemini AI</span>
         </button>
       </div>
 
@@ -1284,6 +1327,24 @@ Target Palette: Shadows=${activeScenario.recommendedHexes.shadows}, Midtones=${a
         isOpen={isSoftwareModalOpen}
         onClose={() => setIsSoftwareModalOpen(false)}
         activeScenarioId={activeScenario.id}
+      />
+
+      {/* Gemini AI Cinematic Palette Studio Modal */}
+      <GeminiCinematicPaletteModal
+        isOpen={isGeminiModalOpen}
+        onClose={() => setIsGeminiModalOpen(false)}
+        onApplyToGradeWorkspace={handleApplyGrade}
+        onSaveToLibrary={newRecipe => {
+          try {
+            const stored = localStorage.getItem('cm_saved_recipes');
+            const list = stored ? JSON.parse(stored) : [];
+            localStorage.setItem('cm_saved_recipes', JSON.stringify([newRecipe, ...list]));
+            setSavedFeedback(true);
+            setTimeout(() => setSavedFeedback(false), 2500);
+          } catch {
+            // fallback
+          }
+        }}
       />
     </section>
   );
