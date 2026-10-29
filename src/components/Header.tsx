@@ -7,7 +7,6 @@ import {
   User,
   BookOpen,
   Camera,
-  Box,
   Globe,
   LogIn,
   LogOut,
@@ -18,8 +17,6 @@ import { useAuth } from '../context/AuthContext';
 export type ActiveTab =
   | 'psychology'
   | 'photo_grader'
-  | 'three_cinema'
-  | 'three_universe'
   | 'harmonies'
   | 'accessibility'
   | 'cinematography'
@@ -52,7 +49,6 @@ export const Header: React.FC<HeaderProps> = ({
   const tabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'psychology', label: 'Psychology', icon: <Palette className="w-4 h-4" /> },
     { id: 'photo_grader', label: 'Photo Grader', icon: <Camera className="w-4 h-4 text-cyan-400" /> },
-    { id: 'three_cinema', label: '3D Stage', icon: <Box className="w-4 h-4 text-amber-400" /> },
     { id: 'harmonies', label: 'Harmonies', icon: <Compass className="w-4 h-4" /> },
     { id: 'accessibility', label: 'Accessibility', icon: <Eye className="w-4 h-4" /> },
     { id: 'cinematography', label: 'Cinematography', icon: <Film className="w-4 h-4" /> },
@@ -83,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="hidden xl:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800/60"
         >
           {tabs.map(tab => {
-            const isActive = activeTab === tab.id || (tab.id === 'photo_grader' && activeTab === 'three_universe');
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
@@ -211,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Responsive nav strip for smaller viewports */}
       <div className="xl:hidden flex items-center gap-1 mt-2.5 overflow-x-auto pb-1 scrollbar-none">
         {tabs.map(tab => {
-          const isActive = activeTab === tab.id || (tab.id === 'photo_grader' && activeTab === 'three_universe');
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}

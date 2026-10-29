@@ -14,7 +14,6 @@ import { CinematographySection } from './components/CinematographySection';
 import { SkinToneSection } from './components/SkinToneSection';
 import { LibrarySection } from './components/LibrarySection';
 import { PhotoColorGradingStudio } from './components/PhotoColorGradingStudio';
-import { ThreeCinemaStage } from './components/ThreeCinemaStage';
 import { RecipeModal } from './components/RecipeModal';
 import { GoogleDriveModal } from './components/GoogleDriveModal';
 import { InstallModal } from './components/InstallModal';
@@ -210,11 +209,9 @@ export default function App() {
           <PsychologySection onLoadIntoWheel={handleLoadColorIntoWheel} />
         )}
 
-        {(activeTab === 'photo_grader' || activeTab === 'three_universe') && (
+        {activeTab === 'photo_grader' && (
           <PhotoColorGradingStudio />
         )}
-
-        {activeTab === 'three_cinema' && <ThreeCinemaStage />}
 
         {activeTab === 'harmonies' && (
           <HarmoniesSection
@@ -247,9 +244,6 @@ export default function App() {
             </button>
             <button onClick={() => setActiveTab('photo_grader')} className="hover:text-white transition-colors text-cyan-400">
               Photo Grader
-            </button>
-            <button onClick={() => setActiveTab('three_cinema')} className="hover:text-white transition-colors text-amber-400 font-semibold">
-              3D Cinema Stage
             </button>
             <button onClick={() => setActiveTab('harmonies')} className="hover:text-white transition-colors">
               Harmonies
