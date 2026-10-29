@@ -450,6 +450,79 @@ export const PhotoColorGradingStudio: React.FC = () => {
     img.src = imageSrc;
   };
 
+  // Track graded analysis in real-time
+  const [gradedAnalysis, setGradedAnalysis] = useState<PhotoAnalysisResult | null>(null);
+
+  const performGradedAnalysis = useCallback(() => {
+    if (!imageSrc || !hiddenCanvasRef.current) return;
+    
+    // Draw graded image to hidden canvas
+    const canvas = hiddenCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Drawing graded image logic... (reusing logic from handleExportGradedImage)
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = imageSrc;
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+
+      // Apply grade to data
+      const kRgb = kelvinToRgb(activeKelvin);
+      const kR = kRgb.r / 0.85;
+      const kG = (kRgb.g / 0.85) * (1 - (activeTint / 100) * 0.15);
+      const kB = (kRgb.b / 0.85) * (1 + (activeTint / 100) * 0.15);
+      const evMult = Math.pow(2, activeExposureEv);
+
+      for (let i = 0; i < data.length; i += 4) {
+        let r = data[i] / 255;
+        let g = data[i + 1] / 255;
+        let b = data[i + 2] / 255;
+
+        r = r * kR * evMult;
+        g = g * kG * evMult;
+        b = b * kB * evMult;
+
+        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        const shadowWeight = Math.pow(Math.max(0, 1 - lum), 1.6);
+        const highlightWeight = Math.pow(lum, 1.4);
+
+        r += activeLift.r * 0.25 * shadowWeight + activeGain.r * 0.3 * highlightWeight;
+        g += activeLift.g * 0.25 * shadowWeight + activeGain.g * 0.3 * highlightWeight;
+        b += activeLift.b * 0.25 * shadowWeight + activeGain.b * 0.3 * highlightWeight;
+        
+        r = 0.45 + (r - 0.45) * activeContrast;
+        g = 0.45 + (g - 0.45) * activeContrast;
+        b = 0.45 + (b - 0.45) * activeContrast;
+
+        const finalLum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        r = finalLum + (r - finalLum) * activeSaturation;
+        g = finalLum + (g - finalLum) * activeSaturation;
+        b = finalLum + (b - finalLum) * activeSaturation;
+
+        data[i] = Math.max(0, Math.min(255, Math.round(r * 255)));
+        data[i + 1] = Math.max(0, Math.min(255, Math.round(g * 255)));
+        data[i + 2] = Math.max(0, Math.min(255, Math.round(b * 255)));
+      }
+      ctx.putImageData(imgData, 0, 0);
+      
+      // Analyze
+      const analysis = analyzeImageCanvas(canvas);
+      setGradedAnalysis(analysis);
+    };
+  }, [imageSrc, activeKelvin, activeTint, activeExposureEv, activeLift, activeGamma, activeGain, activeContrast, activeSaturation]);
+
+  useEffect(() => {
+    const handler = setTimeout(performGradedAnalysis, 200);
+    return () => clearTimeout(handler);
+  }, [performGradedAnalysis]);
+
   // Current grade params package
   const currentGradeParams: CinemaGradeParams = useMemo(() => {
     return {
@@ -855,7 +928,7 @@ Contrast: ${activeContrast.toFixed(2)} | Saturation: ${Math.round(activeSaturati
                 </div>
 
                 {/* Tonal Histogram Overlay */}
-                <HistogramOverlay histogram={analysisResult.histogramData} />
+                <HistogramOverlay histogram={(gradedAnalysis || analysisResult).histogramData} />
 
 
                 <div className="grid grid-cols-2 gap-2 pt-1 text-[10px] text-slate-400 font-mono">
